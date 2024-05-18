@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <input type="text" id="loginUsername" placeholder="Username" required><br>
+        <input type="password" id="loginPassword" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <h1>Register</h1>
+    <form id="registerForm">
+        <input type="text" id="registerUsername" placeholder="Username" required><br>
+        <input type="password" id="registerPassword" placeholder="Password" required><br>
+        <button type="submit">Register</button>
+    </form>
+
+    <h1>Change Password</h1>
+    <form id="changePasswordForm">
+        <input type="password" id="currentPassword" placeholder="Current Password" required><br>
+        <input type="password" id="newPassword" placeholder="New Password" required><br>
+        <button type="submit">Change Password</button>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('token', data.access_token);
+                alert('Login successful');
+            } else {
+                alert(data.msg);
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Registration successful');
+            } else {
+                alert(data.msg);
+            }
+        });
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            const token = localStorage.getItem('token');
+
+            const response = await fetch('/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Password changed successfully');
+            } else {
+                alert(data.msg);
+            }
+        });
+    </script>
+</body>
+</html>
